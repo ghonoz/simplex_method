@@ -72,7 +72,7 @@ metodo_simplex <- function(funcao_objetivo, matriz_restricoes,
     # Precisamos escolher o menor valor da última linha
     # A partir daqui, começa a iteração
     
-    while(any(matriz[nrow(matriz), ] < 0) == TRUE) {
+    while(min(matriz[nrow(matriz), ] < 0) == TRUE) {
       menor_valor <- min(matriz[nrow(matriz), ])
       
       for (i in 1:ncol(matriz)) {
@@ -90,7 +90,7 @@ metodo_simplex <- function(funcao_objetivo, matriz_restricoes,
         }
       }
       
-      valor_linha <- min(get[get!=min(get)])
+      valor_linha <- min(get[get!=min(get)]) 
     
       
   
@@ -105,6 +105,10 @@ metodo_simplex <- function(funcao_objetivo, matriz_restricoes,
       
       matriz_teste <- matriz
       
+      aaa <- matriz_teste
+      
+      aaa
+      aaa[3, 1] <- aaa[3, 1]/pivo
       
       for (i in 1:ncol(matriz)) {
         matriz_teste[linha_salva, i] <- round(matriz_teste[linha_salva, i]/pivo, 2)
