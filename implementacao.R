@@ -6,12 +6,6 @@
 #                                   2x + 3y <= 42
 #                                   3x + y <= 24
 #                                   x >= 0, y >= 0
-teste <- c(1, 1, 1, 5, 0)
-(min(teste) < 0)
-
-resultados <- c(18, 42, 24)
-matriz_restricoes <- matrix(c(2, 1, 2, 3, 3, 1), nrow = 3, byrow = TRUE)
-funcao_objetivo <- c(3, 2)
 
 matriz_restricoes <- matrix(c(2, 1, 0, 2, 3, 0, 3, 1, 0, 5, 6, 7, 4, 8, 1), nrow = 5, ncol = 3, byrow = TRUE)
 metodo_simplex <- function(funcao_objetivo, matriz_restricoes, 
@@ -22,7 +16,7 @@ metodo_simplex <- function(funcao_objetivo, matriz_restricoes,
   
   for (i in 1:length(funcao_objetivo))
   {
-    funcao_objetivo[i] <- -funcao_objetivo[i]
+    funcao_objetivo[i] <- funcao_objetivo[i]
   }
   
   # Precisamos saber a quantidade de linhas e colunas da matriz de restrições dada
@@ -45,8 +39,6 @@ metodo_simplex <- function(funcao_objetivo, matriz_restricoes,
     for (i in 1:nrow(matriz) - 1) {
       matriz[i, 1] <- 0
       matriz[i, 2] <- resultados[i]
-      #matriz[i, 3] <- matriz_restricoes[i, 1]
-      #matriz[i, 4] <- matriz_restricoes[i, 2]
     }
     
     # Agora, implementar baseado na quantidade de variáevis
@@ -67,11 +59,11 @@ metodo_simplex <- function(funcao_objetivo, matriz_restricoes,
     matriz[is.na(matriz)] <- 0
     
     for (i in 1:length(funcao_objetivo)){
-      matriz[nrow(matriz), i+2] <- funcao_objetivo[i]
+      matriz[nrow(matriz), i+2] <- -funcao_objetivo[i]
     }
     
     
-    valores_base <- c(0, 0, -funcao_objetivo, rep(0, numero_linha))
+    valores_base <- c(0, 0, funcao_objetivo, rep(0, numero_linha))
     
     # A PARTIR DAQUI, A MATRIZ ESTÁ MONTADA
     
@@ -87,7 +79,10 @@ metodo_simplex <- function(funcao_objetivo, matriz_restricoes,
           vetor_coluna <- matriz[, i]
           break
         }
-      }
+      } 
+      
+      # Acima, é feito uma conferência do menor valor da linha Z, para salvar os valores da coluna
+      # em que a mesma se encontra
       
       
       for (i in 1:ncol(matriz)) {
@@ -96,14 +91,14 @@ metodo_simplex <- function(funcao_objetivo, matriz_restricoes,
           salvar_coluna <- i
           break
         }
-      }
+      } # Aqui, é feito as divisões da coluna pivô pelo vetor coluna, para tentar achar o menor
 
       
-      get <- get[-length(get)]
+      get <- get[-length(get)] # Eliminamos o último valor, pois é da linha Z
       
-      get <- get[get > 0]
+      get <- get[get > 0] # Só pode escolher se for maior que 0
       
-      valor_linha <- min(get) 
+      valor_linha <- min(get) # Escolhendo o valor 
     
       
   
@@ -112,9 +107,10 @@ metodo_simplex <- function(funcao_objetivo, matriz_restricoes,
           linha_salva <- i
         }
         
-      }
+      } # Escolhendo o valor da linha que se encontra
       
-      pivo <- matriz[linha_salva, salvar_coluna]
+      pivo <- matriz[linha_salva, salvar_coluna] # Atribuindo o valor ao pivô (interseçção entre
+      # a linha e a coluna)
       
       matriz1 <- matriz
       
@@ -159,9 +155,36 @@ metodo_simplex <- function(funcao_objetivo, matriz_restricoes,
     stop('Erro na quantidade de linhas da matriz.')
   }
   
-  return(matriz)
-  print('Problema de maximização com os coeficientes: ')
+  coeficientes <- c(paste0('x', seq(1, length(funcao_objetivo))))
+  valores <- c(funcao_objetivo)
+  df1 <- data.frame(coefficients, values)
   
+  #return(matriz)
+
+  print('Problema de maximização com os coeficientes ')
+  print(df1)
+  a <- c()
+  
+  for (i in 1:nrow(matriz)) {
+    if(matriz[i, 1] > 0) {
+      a[i] <- matriz[i, 2]
+      
+    }
+  }
+  
+  a <- a[!is.na(a)]
+  is.integer(a)
+  
+  print(paste("Os valores são: ", paste(a, collapse = ", "))) # n tava funcionando o outro
+  paste(c("O valor ótimo da função objetivo é: ", optimal), collapse=" ")
+  
+  
+  
+  
+  #message("Valores da solução: ", a)
+  #cat('Valores da solução: ', a)
+  
+  #cat("O valor 'optimal' da função objetiva é:", matriz[nrow(matriz), 2])
 }
 
 matriz_restricoes <- matrix(c(2, 1, 2, 3, 3, 1), nrow = 3, byrow = TRUE)
@@ -186,7 +209,7 @@ metodo_simplex(c(3, 2), matriz_restricoes, c(18, 42, 24))
 
 
 
-metodo_simplex <- function(funcao_objetivo, matriz_restricoes, 
+  metodo_simplex <- function(funcao_objetivo, matriz_restricoes, 
                            resultados, maxi = TRUE) 
 {
   # Como sempre irá passar os valores para o outro lado da equação, os valores da função
